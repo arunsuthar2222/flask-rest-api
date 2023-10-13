@@ -24,7 +24,7 @@ def create_app(db_url=None):
     ] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     
     app.config["SQLALCHEMY_DATABASE_URI"]= db_url or os.getenv("DATABASE_URL","sqlite:///data.db")
-    # app.config["SQLALCHEMY_DATABASE_URI"] = db_url or 'sqlite:///mydatabase.db'
+    # app.config["SQLALCHEMY_DATABASE_URI"] = db_url or 'sqlite:///data.db'
     
     # app.config['SQLALCHEMY_DATABASE_URI_EVEN'] = 'even_url'
     # db1 = SQLAlchemy(app)
