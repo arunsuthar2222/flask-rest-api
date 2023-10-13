@@ -62,7 +62,7 @@ class UserLogin(MethodView):
             #create a access token with jwt seceret key and user's id
             access_token = create_access_token(identity=user.id, additional_claims={"role": user.role}, fresh=True)
             #It only required when client hit /refresh end point and it refreshed
-            refresh_token = create_refresh_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=user.id, additional_claims={"role": user.role})
             return {"access_token":access_token, "refresh_token":refresh_token}
 
 
