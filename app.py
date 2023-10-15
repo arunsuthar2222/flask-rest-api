@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 from db import db
+from dotenv import load_dotenv
 import os
 import models
 from blocklist import BLOCKLIST
@@ -13,6 +14,10 @@ from resources.tag import blp as TagBlueprint
 
 def create_app(db_url=None):
     app = Flask(__name__)
+    
+    #Find .env file and load it's content
+    load_dotenv()
+
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"
@@ -52,6 +57,7 @@ def create_app(db_url=None):
 
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.init_app(app)
+    
     migrate = Migrate(app, db)
     api = Api(app)
 

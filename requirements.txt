@@ -1,10 +1,11 @@
-Flask==2.2.5
-Flask-Smorest
+Flask==2.3.3
+Flask-Smorest==0.42.1
 python-dotenv  
 marshmallow
-Flask-SQLAlchemy==3.1.1
+Flask-SQLAlchemy
 sqlalchemy
 flask-jwt-extended
 flask-migrate
 passlib
 gunicorn
+psycopg2
