@@ -2,6 +2,9 @@ from flask import Flask, jsonify
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 from db import db
+import redis
+from rq import Queue
+from task import send_user_registration_email
 from dotenv import load_dotenv
 import os
 import models
@@ -18,6 +21,11 @@ def create_app(db_url=None):
     #Find .env file and load it's content
     load_dotenv()
 
+    connection = redis.from_url(
+    os.getenv("REDIS_URL")
+    )  # Get this from Render.com or run in Docker
+
+    app.queue = Queue("emails", connection=connection)
     app.config["PROPAGATE_EXCEPTIONS"] = True
     app.config["API_TITLE"] = "Stores REST API"
     app.config["API_VERSION"] = "v1"

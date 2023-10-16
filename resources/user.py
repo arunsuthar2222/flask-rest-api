@@ -1,5 +1,10 @@
+from task import send_user_registration_email
 from flask.views import MethodView
+import os
+import redis
 from flask_smorest import Blueprint, abort
+from flask import current_app
+from sqlalchemy import or_
 from passlib.hash import pbkdf2_sha256
 from flask_jwt_extended import (
     create_access_token,
@@ -10,7 +15,7 @@ from flask_jwt_extended import (
 ) 
 from db import db
 from models import UserModel
-from schemas import UserSchema
+from schemas import UserSchema, UserRegisterSchema
 from blocklist import BLOCKLIST
 
 def roles_required(user_role):
@@ -32,19 +37,30 @@ blp = Blueprint("Users", "users", description="Operation of users")
 
 @blp.route("/register")
 class UserRegister(MethodView):
-    @blp.arguments(UserSchema)
+    @blp.arguments(UserRegisterSchema)
     def post(self, user_data):
-         if UserModel.query.filter(UserModel.username == user_data["username"]).first():
-            abort(409, message="A user with that username already exists.")
+         if UserModel.query.filter(or_(
+             UserModel.username == user_data["username"],
+             UserModel.email == user_data["email"]
+         )).first():
+            abort(409, message="A user with that username or email already exists.")
 
          user = UserModel(
             username=user_data["username"],
+            email=user_data["email"],
             password=pbkdf2_sha256.hash(user_data["password"]),
             role=user_data["role"]
          )
          db.session.add(user)
          db.session.commit()
 
+        #  connection = redis.from_url(
+        #  os.getenv("REDIS_URL")
+        #  )  # Get this from Render.com or run in Docker
+        #  queue = Queue("emails", connection=connection)
+
+         current_app.queue.enqueue(send_user_registration_email, user.email, user.username)
+         
          return {"message": "User created successfully."}, 201
          
 
